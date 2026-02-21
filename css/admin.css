@@ -1,0 +1,27 @@
+/* Admin theme styling using Tailwind + DaisyUI - Minimal custom CSS */
+
+.admin-tab-content {
+    @apply animate-in fade-in duration-300;
+}
+
+.admin-tab-content.hidden {
+    @apply hidden;
+}
+
+/* Tab Button Styling */
+.admin-tab-btn {
+    @apply btn min-w-max lg:w-full font-bold text-sm sm:text-base lg:text-lg justify-start gap-2 px-3 sm:px-4 py-2 sm:py-3 flex-shrink-0 shadow-md hover:shadow-lg transition bg-base-100 text-base-content border border-base-300;
+}
+
+.admin-tab-btn.active {
+    @apply bg-blue-600 text-white border-blue-600 shadow-lg;
+}
+
+/* Modal Styling */
+.modal.modal-hidden {
+    @apply hidden;
+}
+
+.modal.modal-open {
+    @apply flex;
+}

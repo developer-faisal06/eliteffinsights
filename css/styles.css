@@ -1,0 +1,5 @@
+/* Custom styles for the dashboard */
+
+.tab-btn.active {
+    @apply bg-primary text-white;
+}

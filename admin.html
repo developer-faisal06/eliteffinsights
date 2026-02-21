@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="skyYellow">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Elite FX Insights</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- custom palette: sky+white+yellow named "skyYellow" for later reference -->
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        daisyui: {
+          themes: [
+            {
+              skyYellow: {
+                "primary": "#38bdf8",   // sky‑400
+                "secondary": "#facc15", // yellow‑400
+                "accent": "#ffffff",
+                "neutral": "#f0f9ff",
+                "base-100": "#ffffff",
+                "base-200": "#f0f9ff",
+                "base-content": "#1e293b",
+                "info": "#0ea5e9",
+                "success": "#22c55e",
+                "warning": "#f59e0b",
+                "error": "#ef4444"
+              }
+            }
+          ]
+        }
+      };
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        /* Stylish admin tab buttons */
+        .admin-tab-btn {
+            @apply relative flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-3 rounded-xl border border-transparent font-bold text-base transition-all duration-200 shadow hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/50;
+            /* sky-blue gradient base */
+            @apply bg-gradient-to-r from-sky-500 to-sky-700 text-white;
+        }
+        .admin-tab-btn.active, .admin-tab-btn.btn-active {
+            /* yellow highlight for active tab */
+            @apply bg-gradient-to-r from-yellow-400 to-yellow-300 text-sky-900;
+            border-color: rgba(250,204,21,0.75) !important;
+            box-shadow: 0 4px 24px 0 rgba(250,204,21,0.3);
+            transform: scale(1.04);
+            z-index: 1;
+            border-radius: 10px;
+            padding: 10px 20px;
+        }
+        .admin-tab-btn:not(.active):not(.btn-active) {
+            @apply bg-gradient-to-r from-sky-500 to-sky-700 text-white;
+            border-color: transparent !important;
+            opacity: 0.85;
+            transition: all 0.2s ease-in-out;
+            border-radius: 10px;
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body class="bg-base-100 text-base-content scroll-smooth">
+    <!-- Navigation -->
+    <nav class="navbar bg-base-100 shadow-lg sticky top-0 z-50 border-b-2 border-primary">
+        <div class="flex-1">
+            <a href="./index.html" class="btn btn-ghost normal-case text-2xl font-bold text-primary">🛠️ Admin Dashboard</a>
+        </div>
+        <div class="flex-none gap-2">
+            <a href="./index.html" class="btn btn-ghost hover:text-primary transition">Home</a>
+            <a href="./dashboard.html" class="btn btn-ghost hover:text-primary transition">User Dashboard</a>
+            <button onclick="handleLogout()" class="btn btn-error btn-sm">Logout</button>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-2 sm:px-4 py-4 sm:py-8">
+        <!-- Admin Header -->
+        <div class="card bg-gradient-to-r from-primary via-blue-500 to-cyan-400 text-primary-content shadow-xl mb-6 sm:mb-8">
+            <div class="card-body p-4 sm:p-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
+                    <div>
+                        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black mb-2">Admin Control Panel</h1>
+                        <p class="text-sm sm:text-base lg:text-lg opacity-90">Complete platform management and control</p>
+                    </div>
+                    <div class="text-4xl sm:text-5xl lg:text-6xl flex-shrink-0">⚙️</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section - Minimal Horizontal -->
+        <div class="flex gap-2 sm:gap-3 mb-4 sm:mb-6 overflow-x-auto pb-2 flex-wrap">
+            <div class="badge badge-lg badge-primary gap-2 p-3">
+                <i class="fas fa-users"></i>
+                <span class="font-bold"><span id="totalMembers">25</span> Members</span>
+            </div>
+            <div class="badge badge-lg badge-success gap-2 p-3">
+                <i class="fas fa-check-circle"></i>
+                <span class="font-bold"><span id="paidMembers">15</span> Paid</span>
+            </div>
+            <div class="badge badge-lg badge-warning gap-2 p-3">
+                <i class="fas fa-hourglass-half"></i>
+                <span class="font-bold"><span id="pendingPayments">8</span> Pending</span>
+            </div>
+            <div class="badge badge-lg badge-error gap-2 p-3">
+                <i class="fas fa-exclamation"></i>
+                <span class="font-bold"><span id="dueMembers">2</span> Overdue</span>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="grid grid-cols-1 lg:grid-cols-6 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                        <div class="flex flex-col gap-2 lg:col-span-1">
+                <button onclick="showAdminTab('members')" class="admin-tab-btn active" id="membersTab">
+                    <i class="fas fa-users text-lg"></i> <span class="hidden sm:inline">Members</span>
+                </button>
+                <button onclick="showAdminTab('payments')" class="admin-tab-btn" id="paymentsTab">
+                    <i class="fas fa-credit-card text-lg"></i> <span class="hidden sm:inline">Payments</span>
+                </button>
+                <button onclick="showAdminTab('notices')" class="admin-tab-btn" id="noticesTab">
+                    <i class="fas fa-bell text-lg"></i> <span class="hidden sm:inline">Notices</span>
+                </button>
+                <button onclick="showAdminTab('meetings')" class="admin-tab-btn" id="meetingsTab">
+                    <i class="fas fa-calendar text-lg"></i> <span class="hidden sm:inline">Meetings</span>
+                </button>
+                <button onclick="showAdminTab('reports')" class="admin-tab-btn" id="reportsTab">
+                    <i class="fas fa-chart-bar text-lg"></i> <span class="hidden sm:inline">Reports</span>
+                </button>
+                <button onclick="showAdminTab('activity')" class="admin-tab-btn" id="activityTab">
+                    <i class="fas fa-history text-lg"></i> <span class="hidden sm:inline">Activity</span>
+                </button>
+                <button onclick="showAdminTab('settings')" class="admin-tab-btn" id="settingsTab">
+                    <i class="fas fa-cog text-lg"></i> <span class="hidden sm:inline">Settings</span>
+                </button>
+                <button onclick="showAdminTab('promotions')" class="admin-tab-btn" id="promotionsTab">
+                    <i class="fas fa-bullhorn text-lg"></i> <span class="hidden sm:inline">Promotions</span>
+                </button>
+            </div>
+
+            <!-- Tab Content Area -->
+            <div class="lg:col-span-5">
+                <!-- Members Management Tab -->
+                <div id="membersContent" class="admin-tab-content">
+                    <div class="card bg-base-200 shadow-xl">
+                        <div class="card-body">
+                            <h2 class="card-title text-2xl mb-6 text-primary">
+                                <i class="fas fa-list"></i> Members Directory
+                            </h2>
+                            <div class="overflow-x-auto">
+                                <table class="table table-sm sm:table-md">
+                                    <thead class="bg-primary text-primary-content">
+                                        <tr class="text-xs sm:text-sm font-bold">
+                                            <th class="w-1/3">Name</th>
+                                            <th class="hidden sm:table-cell w-1/4">Email</th>
+                                            <th class="hidden md:table-cell">Role</th>
+                                            <th class="hidden lg:table-cell">Join Date</th>
+                                            <th class="w-1/4">Status</th>
+                                            <th class="w-1/6 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="membersTableBody" class="hover"></tbody>
+                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payments Verification Tab -->
+                <div id="paymentsContent" class="admin-tab-content hidden">
+                    <div class="space-y-4 sm:space-y-6">
+                        <!-- Payment Statistics -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+                            <div class="stat bg-gradient-to-br from-success to-green-500 text-success-content shadow-lg p-3 sm:p-4 rounded-lg">
+                                <div class="stat-figure text-2xl">✓</div>
+                                <div class="stat-title text-xs sm:text-sm opacity-90">Approved</div>
+                                <div class="stat-value text-lg sm:text-2xl font-bold">৳45,000</div>
+                            </div>
+                            <div class="stat bg-gradient-to-br from-warning to-yellow-500 text-warning-content shadow-lg p-3 sm:p-4 rounded-lg">
+                                <div class="stat-figure text-2xl">⏳</div>
+                                <div class="stat-title text-xs sm:text-sm opacity-90">Pending</div>
+                                <div class="stat-value text-lg sm:text-2xl font-bold">৳12,000</div>
+                            </div>
+                            <div class="stat bg-gradient-to-br from-error to-red-500 text-error-content shadow-lg p-3 sm:p-4 rounded-lg">
+                                <div class="stat-figure text-2xl">✕</div>
+                                <div class="stat-title text-xs sm:text-sm opacity-90">Rejected</div>
+                                <div class="stat-value text-lg sm:text-2xl font-bold">৳3,500</div>
+                            </div>
+                            <div class="stat bg-gradient-to-br from-info to-blue-500 text-info-content shadow-lg p-3 sm:p-4 rounded-lg">
+                                <div class="stat-figure text-2xl">📊</div>
+                                <div class="stat-title text-xs sm:text-sm opacity-90">Total</div>
+                                <div class="stat-value text-lg sm:text-2xl font-bold">৳60,500</div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Verification Cards -->
+                        <div class="card bg-base-200 shadow-xl">
+                            <div class="card-body">
+                                <div class="flex justify-between items-center mb-6 flex-wrap gap-3">
+                                    <h2 class="card-title text-xl sm:text-2xl text-warning">
+                                        <i class="fas fa-check-circle"></i> Payment Verification
+                                    </h2>
+                                    <div class="flex gap-2">
+                                        <input type="text" placeholder="Search by TrxID..." class="input input-bordered input-sm focus:input-warning w-full sm:w-auto" />
+                                    </div>
+                                </div>
+                                <div class="space-y-3 max-h-96 overflow-y-auto" id="paymentsListContainer">
+                                    <!-- Payment cards will be populated here -->
+                                    <div class="bg-base-100 p-4 rounded-lg border-l-4 border-warning">
+                                        <div class="flex justify-between items-start mb-3">
+                                            <div>
+                                                <p class="font-bold text-base-content">User: Ahmed Khan</p>
+                                                <p class="text-sm text-base-content opacity-70">TrxID: <span class="font-mono">TRX-2026-0012</span></p>
+                                            </div>
+                                            <span class="badge badge-warning">Pending Review</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2 text-sm mb-3">
+                                            <div><i class="fas fa-money-bill-wave text-success"></i> <strong>৳5,000</strong></div>
+                                            <div><i class="fas fa-calendar"></i> 2026-02-18</div>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button class="btn btn-xs btn-success gap-1"><i class="fas fa-check"></i> Approve</button>
+                                            <button class="btn btn-xs btn-error gap-1"><i class="fas fa-times"></i> Reject</button>
+                                            <button class="btn btn-xs btn-outline gap-1"><i class="fas fa-eye"></i> Details</button>
+                                        </div>
+                                    </div>
+                                    <div class="bg-base-100 p-4 rounded-lg border-l-4 border-info">
+                                        <div class="flex justify-between items-start mb-3">
+                                            <div>
+                                                <p class="font-bold text-base-content">User: Fatema Akter</p>
+                                                <p class="text-sm text-base-content opacity-70">TrxID: <span class="font-mono">TRX-2026-0011</span></p>
+                                            </div>
+                                            <span class="badge badge-info">Processing</span>
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-2 text-sm mb-3">
+                                            <div><i class="fas fa-money-bill-wave text-success"></i> <strong>৳3,500</strong></div>
+                                            <div><i class="fas fa-calendar"></i> 2026-02-18</div>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button class="btn btn-xs btn-success gap-1"><i class="fas fa-check"></i> Approve</button>
+                                            <button class="btn btn-xs btn-error gap-1"><i class="fas fa-times"></i> Reject</button>
+                                            <button class="btn btn-xs btn-outline gap-1"><i class="fas fa-eye"></i> Details</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Revenue Report -->
+                        <div class="card bg-base-200 shadow-xl">
+                            <div class="card-body">
+                                <h2 class="card-title text-xl sm:text-2xl text-success mb-6">
+                                    <i class="fas fa-chart-line"></i> Monthly Revenue Report
+                                </h2>
+                                <div class="overflow-x-auto">
+                                    <table class="table table-sm sm:table-md">
+                                        <thead class="bg-success text-success-content">
+                                            <tr class="text-xs sm:text-sm font-bold">
+                                                <th>Month</th>
+                                                <th class="text-right">Approved</th>
+                                                <th class="text-right">Pending</th>
+                                                <th class="text-right">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr><td>Feb 2026</td><td class="text-right text-success font-bold">৳45,000</td><td class="text-right text-warning font-bold">৳12,000</td><td class="text-right font-bold">৳57,000</td></tr>
+                                            <tr><td>Jan 2026</td><td class="text-right text-success font-bold">৳38,500</td><td class="text-right text-warning font-bold">৳4,000</td><td class="text-right font-bold">৳42,500</td></tr>
+                                            <tr><td>Dec 2025</td><td class="text-right text-success font-bold">৳52,000</td><td class="text-right text-warning font-bold">৳8,000</td><td class="text-right font-bold">৳60,000</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notices Management Tab -->
+                <div id="noticesContent" class="admin-tab-content hidden">
+                    <div class="card bg-base-200 shadow-xl">
+                        <div class="card-body">
+                            <h2 class="card-title text-2xl mb-6 text-primary">
+                                <i class="fas fa-bell"></i> Notices Management
+                            </h2>
+                            <form id="addNoticeForm" onsubmit="handleAddNotice(event)" class="space-y-4">
+                                <div>
+                                    <label class="label font-bold"><span>Title</span></label>
+                                    <input type="text" id="noticeTitle" placeholder="Enter notice title..." class="input input-bordered w-full" required>
+                                </div>
+                                <div>
+                                    <label class="label font-bold"><span>Message</span></label>
+                                    <textarea id="noticeMessage" placeholder="Type the announcement details..." class="textarea textarea-bordered w-full" rows="4" required></textarea>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="label font-bold"><span>Priority</span></label>
+                                        <select id="noticePriority" class="select select-bordered w-full">
+                                            <option value="normal">Normal</option>
+                                            <option value="important">Important</option>
+                                            <option value="urgent">Urgent</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="label font-bold"><span>Publish at</span></label>
+                                        <input type="datetime-local" id="noticePublish" class="input input-bordered w-full">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="label font-bold"><span>Expiry at</span></label>
+                                        <input type="datetime-local" id="noticeExpiry" class="input input-bordered w-full">
+                                    </div>
+                                    <div class="flex items-center mt-4">
+                                        <input type="checkbox" id="noticePin" class="checkbox checkbox-primary mr-2">
+                                        <label for="noticePin" class="font-bold">Pin to Top</label>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="flex items-center mt-2">
+                                        <input type="checkbox" id="noticeEmail" class="checkbox mr-2">
+                                        <label for="noticeEmail" class="font-semibold">Send Email</label>
+                                    </div>
+                                    <div class="flex items-center mt-2">
+                                        <input type="checkbox" id="noticeNotify" class="checkbox mr-2">
+                                        <label for="noticeNotify" class="font-semibold">App Notification</label>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-full mt-4">
+                                    <i class="fas fa-paper-plane"></i> Publish Notice
+                                </button>
+                            </form>
+
+                            <div class="mt-8">
+                                <h3 class="text-xl font-bold mb-4">Existing Notices</h3>
+                                <div id="noticesListContainer" class="space-y-3 max-h-96 overflow-y-auto"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Meetings Control Tab -->
+                <div id="meetingsContent" class="admin-tab-content hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                        <!-- Update Meeting Form (Left) -->
+                        <div class="card bg-base-200 shadow-xl">
+                            <div class="card-body">
+                                <h3 class="card-title text-xl sm:text-2xl mb-6 text-info">
+                                    <i class="fas fa-plus-circle"></i> Add/Update Meeting
+                                </h3>
+                                <form id="updateMeetingForm" onsubmit="handleUpdateMeeting(event)" class="space-y-4">
+                                    <div>
+                                        <label class="label font-bold">
+                                            <span><i class="fas fa-tag text-info"></i> Meeting Category</span>
+                                        </label>
+                                        <select id="meetingCategory" class="select select-bordered w-full focus:select-info" required>
+                                            <option value="">-- Select Category --</option>
+                                            <option value="orientation">Orientation & Onboarding</option>
+                                            <option value="market-analysis">Market Analysis & Research</option>
+                                            <option value="risk-management">Risk Management Strategy</option>
+                                            <option value="trading-signals">Trading Signals & Alerts</option>
+                                            <option value="personal-coaching">Personal Coaching Session</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="label font-bold">
+                                            <span><i class="fas fa-heading text-info"></i> Meeting Title</span>
+                                        </label>
+                                        <input type="text" id="meetingTitle" placeholder="Enter meeting title..." class="input input-bordered w-full focus:input-info" required>
+                                    </div>
+
+                                    <div>
+                                        <label class="label font-bold">
+                                            <span><i class="fas fa-link text-info"></i> Meeting Link</span>
+                                        </label>
+                                        <input type="url" id="meetingLink" placeholder="https://zoom.us/j/..." class="input input-bordered w-full focus:input-info" required>
+                                    </div>
+
+                                    <div>
+                                        <label class="label font-bold">
+                                            <span><i class="fas fa-clock text-info"></i> Date & Time (BD Timezone)</span>
+                                        </label>
+                                        <input type="datetime-local" id="meetingDateTime" class="input input-bordered w-full focus:input-info" required>
+                                        <p class="text-xs text-base-content opacity-70 mt-2">
+                                            <i class="fas fa-info-circle"></i> Time Zone: Bangladesh Standard Time (BDT / UTC+6)
+                                        </p>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-info w-full gap-2 mt-4">
+                                        <i class="fas fa-save"></i> Create / Update Meeting
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Meetings List (Right) -->
+                        <div class="card bg-base-200 shadow-xl">
+                            <div class="card-body">
+                                <div class="flex justify-between items-center mb-6 gap-3 flex-wrap">
+                                    <h3 class="card-title text-xl sm:text-2xl text-primary">
+                                        <i class="fas fa-list"></i> All Meetings
+                                    </h3>
+                                    <!-- Sort Buttons -->
+                                    <div class="flex gap-2 flex-wrap justify-end">
+                                        <button onclick="sortMeetings('status')" class="btn btn-xs btn-outline btn-primary hover:bg-primary hover:border-primary transition" title="Sort by Status (Active First)">
+                                            <i class="fas fa-filter"></i> Status
+                                        </button>
+                                        <button onclick="sortMeetings('date')" class="btn btn-xs btn-outline btn-primary hover:bg-primary hover:border-primary transition" title="Sort by Date (Click again to reverse)">
+                                            <i class="fas fa-calendar"></i> Date <span id="dateSortOrder" class="text-xs opacity-70"></span>
+                                        </button>
+                                        <button onclick="sortMeetings('id')" class="btn btn-xs btn-outline btn-primary hover:bg-primary hover:border-primary transition" title="Sort by ID (Click again to reverse)">
+                                            <i class="fas fa-hashtag"></i> ID <span id="idSortOrder" class="text-xs opacity-70"></span>
+                                        </button>
+                                        <button onclick="sortMeetings('a-z')" class="btn btn-xs btn-outline btn-primary hover:bg-primary hover:border-primary transition" title="Sort A-Z">
+                                            <i class="fas fa-arrow-down-a-z"></i> A-Z
+                                        </button>
+                                        <button onclick="sortMeetings('z-a')" class="btn btn-xs btn-outline btn-primary hover:bg-primary hover:border-primary transition" title="Sort Z-A">
+                                            <i class="fas fa-arrow-up-z-a"></i> Z-A
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Meetings List Container -->
+                                <div class="space-y-3 max-h-96 overflow-y-auto">
+                                    <div id="meetingsListContainer">
+                                        <!-- Meetings will be populated by JavaScript -->
+                                    </div>
+                                </div>
+
+                                <!-- Pagination -->
+                                <div class="mt-6 pt-4 border-t border-base-300">
+                                    <div class="flex justify-between items-center gap-2 flex-wrap">
+                                        <div class="text-sm text-base-content opacity-70">
+                                            <span id="meetingsPageInfo">Page 1 of 1</span>
+                                        </div>
+                                        <div class="btn-group gap-1">
+                                            <button onclick="previousMeetingPage()" class="btn btn-sm btn-outline btn-primary hover:bg-primary hover:border-primary transition">
+                                                <i class="fas fa-chevron-left"></i> Prev
+                                            </button>
+                                            <button class="btn btn-sm btn-disabled btn-outline text-center px-4">
+                                                <span id="meetingPageNumber">1</span>
+                                            </button>
+                                            <button onclick="nextMeetingPage()" class="btn btn-sm btn-outline btn-primary hover:bg-primary hover:border-primary transition">
+                                                Next <i class="fas fa-chevron-right"></i>
+                                            </button>
+                                        </div>
+                                        <div class="text-sm text-base-content opacity-70">
+                                            Total: <span id="meetingsTotalCount">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Tab -->
+                <div id="reportsContent" class="admin-tab-content hidden">
+                    <div class="space-y-4 sm:space-y-6">
+                        <!-- Dashboard Overview -->
+                        <div class="card bg-base-200 shadow-xl">
+                            <div class="card-body">
+                                <h2 class="card-title text-xl sm:text-2xl text-secondary mb-4">
+                                    <i class="fas fa-chart-pie"></i> Dashboard Overview
+                                </h2>
+                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+                                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-4 rounded-lg text-center">
+                                        <div class="text-3xl font-bold">1,250</div>
+                                        <div class="text-sm opacity-90">Total Users</div>
+                                    </div>
+                                    <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-4 rounded-lg text-center">
+                                        <div class="text-3xl font-bold">৳8,500</div>
+                                        <div class="text-sm opacity-90">Today's Revenue</div>
+                                    </div>
+                                    <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-4 rounded-lg text-center">
+                                        <div class="text-3xl font-bold">₹12,000</div>
+                                        <div class="text-sm opacity-90">Pending Payment</div>
+                                    </div>
+                                    <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-4 rounded-lg text-center">
+                                        <div class="text-3xl font-bold">28</div>
+                                        <div class="text-sm opacity-90">Active Meetings</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reviews Management -->
+                        <div class="card bg-base-200 shadow-xl">
+                            <div class="card-body">
+                                <h2 class="card-title text-xl sm:text-2xl text-info mb-6">
+                                    <i class="fas fa-star"></i> Review Management
+                                </h2>
+                                <div class="tabs tabs-boxed mb-4 flex-wrap">
+                                    <input type="radio" name="reviewTab" class="tab tab-sm sm:tab-md" aria-label="Pending" checked />
+                                    <input type="radio" name="reviewTab" class="tab tab-sm sm:tab-md" aria-label="Approved" />
+                                    <input type="radio" name="reviewTab" class="tab tab-sm sm:tab-md" aria-label="Rejected" />
+                                </div>
+                                <div class="space-y-3 max-h-80 overflow-y-auto">
+                                    <!-- Review 1 -->
+                                    <div class="bg-base-100 p-4 rounded-lg border-l-4 border-warning">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div>
+                                                <p class="font-bold text-base-content">Md. Saiful Islam</p>
+                                                <p class="text-xs text-base-content opacity-70">Submitted: 2026-02-18</p>
+                                            </div>
+                                            <span class="badge badge-warning">Pending</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="rating rating-sm gap-1 mb-2">
+                                                <input type="radio" name="rating1" class="rating-item bg-warning" checked disabled/>
+                                                <input type="radio" name="rating1" class="rating-item bg-warning" checked disabled/>
+                                                <input type="radio" name="rating1" class="rating-item bg-warning" checked disabled/>
+                                                <input type="radio" name="rating1" class="rating-item bg-warning" checked disabled/>
+                                                <input type="radio" name="rating1" class="rating-item bg-warning" disabled/>
+                                            </div>
+                                            <p class="text-sm text-base-content">দুর্দান্ত ট্রেডিং প্ল্যাটফর্ম এবং বিশাল সম্ভাবনা রয়েছে এখানে। আমি অত্যন্ত সন্তুষ্ট!</p>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button class="btn btn-xs btn-success gap-1"><i class="fas fa-check"></i> Approve</button>
+                                            <button class="btn btn-xs btn-error gap-1"><i class="fas fa-times"></i> Reject</button>
+                                        </div>
+                                    </div>
+                                    <!-- Review 2 -->
+                                    <div class="bg-base-100 p-4 rounded-lg border-l-4 border-info">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div>
+                                                <p class="font-bold text-base-content">Rina Roy</p>
+                                                <p class="text-xs text-base-content opacity-70">Submitted: 2026-02-17</p>
+                                            </div>
+                                            <span class="badge badge-info">Pending</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="rating rating-sm gap-1 mb-2">
+                                                <input type="radio" name="rating2" class="rating-item bg-warning" checked disabled/>
+                                                <input type="radio" name="rating2" class="rating-item bg-warning" checked disabled/>
+                                                <input type="radio" name="rating2" class="rating-item bg-warning" checked disabled/>
+                                                <input type="radio" name="rating2" class="rating-item bg-warning" checked disabled/>
+                                                <input type="radio" name="rating2" class="rating-item bg-warning" checked disabled/>
+                                            </div>
+                                            <p class="text-sm text-base-content">প্রফেশনাল সেবা এবং নিরাপদ প্ল্যাটফর্ম। সত্যিই দুর্দান্ত অভিজ্ঞতা ছিল!</p>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button class="btn btn-xs btn-success gap-1"><i class="fas fa-check"></i> Approve</button>
+                                            <button class="btn btn-xs btn-error gap-1"><i class="fas fa-times"></i> Reject</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Analytics Reports -->
+                        <div class="card bg-base-200 shadow-xl">
+                            <div class="card-body">
+                                <h2 class="card-title text-xl sm:text-2xl mb-6 text-secondary">
+                                    <i class="fas fa-chart-bar"></i> Analytics & Reports
+                                </h2>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition">
+                                        <h3 class="font-bold text-lg mb-2"><i class="fas fa-chart-line"></i> Revenue Report</h3>
+                                        <p class="text-sm opacity-90 mb-4">View total revenue and payment trends</p>
+                                        <button class="btn btn-sm btn-light w-full"><i class="fas fa-arrow-right"></i> View</button>
+                                    </div>
+                                    <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition">
+                                        <h3 class="font-bold text-lg mb-2"><i class="fas fa-users"></i> Member Report</h3>
+                                        <p class="text-sm opacity-90 mb-4">Track member registrations and growth</p>
+                                        <button class="btn btn-sm btn-light w-full"><i class="fas fa-arrow-right"></i> View</button>
+                                    </div>
+                                    <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition">
+                                        <h3 class="font-bold text-lg mb-2"><i class="fas fa-calendar"></i> Meeting Report</h3>
+                                        <p class="text-sm opacity-90 mb-4">Session attendance metrics</p>
+                                        <button class="btn btn-sm btn-light w-full"><i class="fas fa-arrow-right"></i> View</button>
+                                    </div>
+                                    <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-6 rounded-lg shadow-lg hover:shadow-xl transition">
+                                        <h3 class="font-bold text-lg mb-2"><i class="fas fa-exclamation"></i> Issues Report</h3>
+                                        <p class="text-sm opacity-90 mb-4">Track complaints and issues</p>
+                                        <button class="btn btn-sm btn-light w-full"><i class="fas fa-arrow-right"></i> View</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Log Tab -->
+                <div id="activityContent" class="admin-tab-content hidden">
+                    <div class="space-y-4 sm:space-y-6">
+                        <!-- Bulk Notification Section -->
+                        <div class="card bg-base-200 shadow-xl">
+                            <div class="card-body">
+                                <h2 class="card-title text-xl sm:text-2xl text-warning mb-4">
+                                    <i class="fas fa-bell"></i> Send Bulk Notification
+                                </h2>
+                                <form class="space-y-4">
+                                    <div class="form-control">
+                                        <label class="label">
+                                            <span class="label-text font-bold">Notification Title</span>
+                                        </label>
+                                        <input type="text" placeholder="Enter notification title..." class="input input-bordered focus:input-warning" />
+                                    </div>
+                                    <div class="form-control">
+                                        <label class="label">
+                                            <span class="label-text font-bold">Message</span>
+                                        </label>
+                                        <textarea placeholder="Enter message for all users..." class="textarea textarea-bordered focus:textarea-warning" rows="4"></textarea>
+                                    </div>
+                                    <div class="form-control">
+                                        <label class="label">
+                                            <span class="label-text font-bold">Send Via</span>
+                                        </label>
+                                        <div class="flex gap-4 flex-wrap">
+                                            <label class="label cursor-pointer gap-2">
+                                                <input type="checkbox" class="checkbox checkbox-warning" checked />
+                                                <span class="label-text"><i class="fas fa-dashboard"></i> Dashboard</span>
+                                            </label>
+                                            <label class="label cursor-pointer gap-2">
+                                                <input type="checkbox" class="checkbox checkbox-warning" checked />
+                                                <span class="label-text"><i class="fas fa-envelope"></i> Email</span>
+                                            </label>
+                                            <label class="label cursor-pointer gap-2">
+                                                <input type="checkbox" class="checkbox checkbox-warning" />
+                                                <span class="label-text"><i class="fas fa-sms"></i> SMS</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-warning w-full gap-2">
+                                        <i class="fas fa-send"></i> Send to All Users
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- User Activity Log -->
+                        <div class="card bg-base-200 shadow-xl">
+                            <div class="card-body">
+                                <div class="flex justify-between items-center mb-6 gap-3 flex-wrap">
+                                    <h2 class="card-title text-xl sm:text-2xl text-accent">
+                                        <i class="fas fa-history"></i> User Activity Tracker
+                                    </h2>
+                                    <div class="flex gap-2 flex-wrap">
+                                        <select class="select select-bordered select-sm focus:select-accent">
+                                            <option>Filter by Activity</option>
+                                            <option>Login</option>
+                                            <option>Payment</option>
+                                            <option>Meeting Joined</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="table table-sm sm:table-md">
+                                        <thead class="bg-accent text-accent-content">
+                                            <tr class="text-xs sm:text-sm font-bold">
+                                                <th>User</th>
+                                                <th class="hidden sm:table-cell">Activity</th>
+                                                <th>Timestamp</th>
+                                                <th class="hidden md:table-cell">IP Address</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="text-xs sm:text-sm hover">
+                                                <td><span class="font-semibold">Ahmed Khan</span></td>
+                                                <td class="hidden sm:table-cell"><span class="badge badge-info">Login</span></td>
+                                                <td>2026-02-18 14:35</td>
+                                                <td class="hidden md:table-cell font-mono text-xs">192.168.1.105</td>
+                                                <td><span class="badge badge-success">Success</span></td>
+                                            </tr>
+                                            <tr class="text-xs sm:text-sm hover">
+                                                <td><span class="font-semibold">Fatema Akter</span></td>
+                                                <td class="hidden sm:table-cell"><span class="badge badge-success">Payment</span></td>
+                                                <td>2026-02-18 14:28</td>
+                                                <td class="hidden md:table-cell font-mono text-xs">192.168.1.108</td>
+                                                <td><span class="badge badge-success">Success</span></td>
+                                            </tr>
+                                            <tr class="text-xs sm:text-sm hover">
+                                                <td><span class="font-semibold">Rina Roy</span></td>
+                                                <td class="hidden sm:table-cell"><span class="badge badge-warning">Meeting Join</span></td>
+                                                <td>2026-02-18 14:15</td>
+                                                <td class="hidden md:table-cell font-mono text-xs">192.168.1.112</td>
+                                                <td><span class="badge badge-success">Success</span></td>
+                                            </tr>
+                                            <tr class="text-xs sm:text-sm hover">
+                                                <td><span class="font-semibold">Saiful Islam</span></td>
+                                                <td class="hidden sm:table-cell"><span class="badge badge-info">Login</span></td>
+                                                <td>2026-02-18 13:45</td>
+                                                <td class="hidden md:table-cell font-mono text-xs">192.168.1.110</td>
+                                                <td><span class="badge badge-success">Success</span></td>
+                                            </tr>
+                                            <tr class="text-xs sm:text-sm hover">
+                                                <td><span class="font-semibold">Karim Hassan</span></td>
+                                                <td class="hidden sm:table-cell"><span class="badge badge-error">Failed Login</span></td>
+                                                <td>2026-02-18 13:20</td>
+                                                <td class="hidden md:table-cell font-mono text-xs">192.168.1.103</td>
+                                                <td><span class="badge badge-error">Failed</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- System Activity Log -->
+                        <div class="card bg-base-200 shadow-xl">
+                            <div class="card-body">
+                                <h2 class="card-title text-xl sm:text-2xl text-info mb-6">
+                                    <i class="fas fa-cog"></i> System Activity Log
+                                </h2>
+                                <div class="overflow-x-auto">
+                                    <table class="table table-sm sm:table-md">
+                                        <thead class="bg-info text-info-content">
+                                            <tr class="text-xs sm:text-sm font-bold">
+                                                <th>Admin</th>
+                                                <th>Action</th>
+                                                <th>Timestamp</th>
+                                                <th class="hidden md:table-cell">IP</th>
+                                                <th>Result</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="text-xs sm:text-sm hover">
+                                                <td><span class="font-semibold">Admin User</span></td>
+                                                <td><span class="badge badge-info">Payment Verified</span></td>
+                                                <td>2026-02-18 14:30</td>
+                                                <td class="hidden md:table-cell font-mono text-xs">192.168.1.1</td>
+                                                <td><span class="badge badge-success">Success</span></td>
+                                            </tr>
+                                            <tr class="text-xs sm:text-sm hover">
+                                                <td><span class="font-semibold">Admin User</span></td>
+                                                <td><span class="badge badge-warning">Meeting Updated</span></td>
+                                                <td>2026-02-18 14:15</td>
+                                                <td class="hidden md:table-cell font-mono text-xs">192.168.1.1</td>
+                                                <td><span class="badge badge-success">Success</span></td>
+                                            </tr>
+                                            <tr class="text-xs sm:text-sm hover">
+                                                <td><span class="font-semibold">Admin User</span></td>
+                                                <td><span class="badge badge-success">User Banned</span></td>
+                                                <td>2026-02-18 14:00</td>
+                                                <td class="hidden md:table-cell font-mono text-xs">192.168.1.1</td>
+                                                <td><span class="badge badge-success">Success</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="settingsContent" class="admin-tab-content hidden">
+                    <div class="space-y-4 sm:space-y-6">
+                        <!-- Payment Methods Settings -->
+                        <div class="card bg-base-200 shadow-xl">
+                            <div class="card-body">
+                                <h2 class="card-title text-xl sm:text-2xl text-primary mb-6">
+                                    <i class="fas fa-wallet"></i> Payment Methods Configuration
+                                </h2>
+                                <div class="space-y-4">
+                                    <!-- Bkash -->
+                                    <div class="bg-base-100 p-4 rounded-lg border-l-4 border-primary">
+                                        <div class="flex justify-between items-start mb-3">
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-mobile-alt text-2xl text-primary"></i>
+                                                <div>
+                                                    <p class="font-bold">Bkash</p>
+                                                    <p class="text-xs text-base-content opacity-70">Mobile Money Payment</p>
+                                                </div>
+                                            </div>
+                                            <input type="checkbox" class="toggle toggle-primary" checked />
+                                        </div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <input type="text" placeholder="Bkash Number..." class="input input-bordered input-sm" value="01701234567" />
+                                            <input type="text" placeholder="Merchant ID..." class="input input-bordered input-sm" value="MERCHANT001" />
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Binance -->
+                                    <div class="bg-base-100 p-4 rounded-lg border-l-4 border-warning">
+                                        <div class="flex justify-between items-start mb-3">
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-bitcoin text-2xl text-warning"></i>
+                                                <div>
+                                                    <p class="font-bold">Binance</p>
+                                                    <p class="text-xs text-base-content opacity-70">Crypto Payment Gateway</p>
+                                                </div>
+                                            </div>
+                                            <input type="checkbox" class="toggle toggle-warning" checked />
+                                        </div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <input type="text" placeholder="Wallet Address..." class="input input-bordered input-sm" value="1A1z7agoat4..." />
+                                            <input type="text" placeholder="API Key..." class="input input-bordered input-sm" placeholder="API Key" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Payoneer -->
+                                    <div class="bg-base-100 p-4 rounded-lg border-l-4 border-success">
+                                        <div class="flex justify-between items-start mb-3">
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-globe text-2xl text-success"></i>
+                                                <div>
+                                                    <p class="font-bold">Payoneer</p>
+                                                    <p class="text-xs text-base-content opacity-70">International Payment</p>
+                                                </div>
+                                            </div>
+                                            <input type="checkbox" class="toggle toggle-success" />
+                                        </div>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <input type="text" placeholder="Payoneer Email..." class="input input-bordered input-sm" />
+                                            <input type="text" placeholder="Merchant Account..." class="input input-bordered input-sm" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-primary w-full gap-2 mt-6">
+                                    <i class="fas fa-save"></i> Save Payment Methods
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Site Settings -->
+                        <div class="card bg-base-200 shadow-xl">
+                            <div class="card-body">
+                                <h2 class="card-title text-xl sm:text-2xl text-info mb-6">
+                                    <i class="fas fa-cog"></i> Site Settings
+                                </h2>
+                                <div class="space-y-4">
+                                    <div class="bg-gradient-to-r from-base-100 to-primary/10 p-4 rounded-lg border-l-4 border-primary">
+                                        <label class="font-bold mb-2 block">Site Logo</label>
+                                        <div class="flex gap-2">
+                                            <input type="file" class="input input-bordered input-sm flex-1" />
+                                            <button class="btn btn-primary btn-sm"><i class="fas fa-upload"></i> Upload</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-gradient-to-r from-base-100 to-success/10 p-4 rounded-lg border-l-4 border-success">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <label class="font-bold flex items-center gap-2">
+                                                <i class="fas fa-tools text-success"></i> Maintenance Mode
+                                            </label>
+                                            <input type="checkbox" class="toggle toggle-success" />
+                                        </div>
+                                        <p class="text-sm text-base-content opacity-70">Temporarily disable public access</p>
+                                    </div>
+
+                                    <div class="bg-gradient-to-r from-base-100 to-warning/10 p-4 rounded-lg border-l-4 border-warning">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <label class="font-bold flex items-center gap-2">
+                                                <i class="fas fa-unlock-alt text-warning"></i> Auto-unlock Meetings
+                                            </label>
+                                            <input type="checkbox" class="toggle toggle-warning" checked />
+                                        </div>
+                                        <p class="text-sm text-base-content opacity-70">Automatically unlock meetings after payment</p>
+                                    </div>
+
+                                    <div class="bg-gradient-to-r from-base-100 to-error/10 p-4 rounded-lg border-l-4 border-error">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <label class="font-bold flex items-center gap-2">
+                                                <i class="fas fa-bell text-error"></i> Email Notifications
+                                            </label>
+                                            <input type="checkbox" class="toggle toggle-error" checked />
+                                        </div>
+                                        <p class="text-sm text-base-content opacity-70">Send email on new payments and signups</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security & Logs -->
+                        <div class="card bg-base-200 shadow-xl">
+                            <div class="card-body">
+                                <h2 class="card-title text-xl sm:text-2xl text-error mb-6">
+                                    <i class="fas fa-lock"></i> Security & Backup
+                                </h2>
+                                <div class="space-y-4">
+                                    <div class="bg-base-100 p-4 rounded-lg border-l-4 border-error">
+                                        <p class="font-bold mb-2"><i class="fas fa-history text-error"></i> Admin Login History</p>
+                                        <button class="btn btn-sm btn-outline btn-error gap-2">
+                                            <i class="fas fa-eye"></i> View History
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="bg-base-100 p-4 rounded-lg border-l-4 border-warning">
+                                        <p class="font-bold mb-2"><i class="fas fa-network-wired text-warning"></i> IP Tracking</p>
+                                        <p class="text-sm text-base-content opacity-70 mb-2">Last Admin Login: 192.168.1.1</p>
+                                        <button class="btn btn-sm btn-outline btn-warning gap-2">
+                                            <i class="fas fa-list"></i> View All IPs
+                                        </button>
+                                    </div>
+
+                                    <div class="bg-base-100 p-4 rounded-lg border-l-4 border-success">
+                                        <p class="font-bold mb-2"><i class="fas fa-database text-success"></i> Database Backup</p>
+                                        <p class="text-sm text-base-content opacity-70 mb-2">Last backup: 2026-02-18 12:00 AM</p>
+                                        <div class="flex gap-2 flex-wrap">
+                                            <button class="btn btn-sm btn-success gap-2">
+                                                <i class="fas fa-download"></i> Backup Now
+                                            </button>
+                                            <button class="btn btn-sm btn-outline btn-success gap-2">
+                                                <i class="fas fa-history"></i> Backup History
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- General Settings -->
+                        <div class="card bg-base-200 shadow-xl">
+                            <div class="card-body">
+                                <h2 class="card-title text-xl sm:text-2xl text-secondary mb-6">
+                                    <i class="fas fa-sliders-h"></i> General Settings
+                                </h2>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="label">
+                                            <span class="label-text font-bold">Site Title</span>
+                                        </label>
+                                        <input type="text" placeholder="Elite FX Insights" class="input input-bordered w-full" value="Elite FX Insights" />
+                                    </div>
+                                    <div>
+                                        <label class="label">
+                                            <span class="label-text font-bold">Default Currency</span>
+                                        </label>
+                                        <select class="select select-bordered w-full">
+                                            <option selected>BDT (৳)</option>
+                                            <option>USD ($)</option>
+                                            <option>INR (₹)</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn btn-secondary w-full gap-2">
+                                        <i class="fas fa-save"></i> Save General Settings
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Promotions Tab -->
+                <div id="promotionsContent" class="admin-tab-content hidden">
+                    <div class="card bg-base-200 shadow-xl">
+                        <div class="card-body">
+                            <h2 class="card-title text-2xl mb-6 text-primary">
+                                <i class="fas fa-bullhorn"></i> Promotions Management
+                            </h2>
+                            <p>Promotions content will go here.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Modal -->
+    <div id="actionModal" class="modal hidden">
+        <div class="modal-box bg-base-100 shadow-xl">
+            <h3 class="font-bold text-lg text-primary" id="modalTitle">Confirm Action</h3>
+            <p class="py-4 text-base-content opacity-80" id="modalMessage">Are you sure you want to proceed?</p>
+            <div class="modal-action gap-2">
+                <button onclick="closeActionModal()" class="btn btn-outline btn-ghost">Cancel</button>
+                <button onclick="confirmAction()" class="btn btn-primary gap-2">
+                    <i class="fas fa-check"></i> Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Meeting Modal -->
+    <div id="cancelMeetingModal" class="modal modal-hidden">
+        <div class="modal-box bg-base-100 border-2 border-error border-opacity-20 shadow-xl">
+            <button onclick="closeCancelModal()" class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            <h3 class="font-bold text-lg text-error mb-1">
+                <i class="fas fa-times-circle"></i> Cancel Meeting
+            </h3>
+            <p class="text-xs text-base-content opacity-60 mb-4">Provide a reason for cancellation</p>
+            
+            <form id="cancelMeetingForm" onsubmit="submitCancelMeeting(event)">
+                <div class="mb-4 p-3 bg-base-200 rounded-lg border-l-4 border-error">
+                    <p class="text-sm text-base-content opacity-80">
+                        Meeting: <strong id="cancelMeetingTitle" class="text-primary">Meeting Title</strong>
+                    </p>
+                </div>
+                
+                <div class="form-control mb-4">
+                    <label class="label pt-0">
+                        <span class="label-text font-semibold text-base-content">Cancellation Reason</span>
+                    </label>
+                    <textarea 
+                        id="cancellationReason" 
+                        class="textarea textarea-bordered bg-base-100 text-base-content focus:outline-none focus:border-error focus:border-2" 
+                        placeholder="Enter reason for cancellation..." 
+                        rows="4" 
+                        required>
+                    </textarea>
+                </div>
+                
+                <div class="modal-action gap-2 pt-4">
+                    <button type="button" onclick="closeCancelModal()" class="btn btn-outline btn-primary gap-2">
+                        <i class="fas fa-arrow-left"></i> Keep Meeting
+                    </button>
+                    <button type="submit" class="btn btn-error gap-2 hover:btn-error hover:opacity-90">
+                        <i class="fas fa-check"></i> Confirm Cancellation
+                    </button>
+                </div>
+            </form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button onclick="closeCancelModal()"></button>
+        </form>
+    </div>
+
+    <script src="js/admin.js"></script>
+    <script>
+        // Tab switching logic for active color/background
+        function showAdminTab(tab) {
+            const tabs = ['members', 'payments', 'notices', 'meetings', 'reports', 'activity', 'settings'];
+            tabs.forEach(t => {
+                const contentEl = document.getElementById(t + 'Content');
+                const tabEl = document.getElementById(t + 'Tab');
+                if (contentEl) contentEl.classList.toggle('hidden', t !== tab);
+                if (tabEl) tabEl.classList.toggle('active', t === tab);
+            });
+
+            // additional loader for notices tab
+            if (tab === 'notices' && typeof loadNotices === 'function') {
+                try { loadNotices(); } catch(e) { console.error(e); }
+            }
+        }
+        // Set default active tab on load
+        document.addEventListener('DOMContentLoaded', () => showAdminTab('members'));
+    </script>
+</body>
+</html>

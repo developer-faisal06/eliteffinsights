@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="skyYellow">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite FX Insights - Forex Trading Analysis & Mentorship</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- shared sky+white+yellow palette from admin, name: skyYellow -->
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        daisyui: {
+          themes: [
+            {
+              skyYellow: {
+                "primary": "#38bdf8",
+                "secondary": "#facc15",
+                "accent": "#ffffff",
+                "neutral": "#f0f9ff",
+                "base-100": "#ffffff",
+                "base-200": "#f0f9ff",
+                "base-content": "#1e293b",
+                "info": "#0ea5e9",
+                "success": "#22c55e",
+                "warning": "#f59e0b",
+                "error": "#ef4444"
+              }
+            }
+          ]
+        }
+      };
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-base-100 text-base-content scroll-smooth">
+    <!-- Navigation -->
+    <nav class="navbar bg-base-100 shadow-lg sticky top-0 z-50 border-b-2 border-primary">
+        <div class="flex-1">
+            <a href="#home" class="btn btn-ghost normal-case text-2xl font-bold text-primary">🚀 Eliteffinsights.com</a>
+        </div>
+        <div class="flex-none gap-2">
+            <a href="./" class="btn btn-ghost hover:text-primary transition">Home</a>
+            <a href="./dashboard.html" class="btn btn-ghost hover:text-primary transition">Dashboard</a>
+            <a href="./admin.html" class="btn btn-ghost hover:text-primary transition">Admin</a>
+            <button onclick="handleLogout()" class="btn btn-error btn-sm">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero min-h-screen bg-gradient-to-br from-primary via-blue-500 to-cyan-400 text-primary-content relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+        </div>
+        <div class="hero-content text-center relative z-10">
+            <div class="max-w-3xl">
+                <h1 class="text-6xl font-black mb-6 drop-shadow-lg">📈 Master Forex Trading</h1>
+                <p class="text-2xl mb-4 opacity-95">Real-time Analysis & Professional Mentorship</p>
+                <p class="text-lg mb-8 opacity-90">Join thousands of traders learning from industry experts in a secure learning environment</p>
+                <div class="flex gap-4 justify-center">
+                    <button onclick="goToDashboard()" class="btn btn-lg btn-secondary shadow-lg hover:shadow-2xl transition transform hover:scale-105">Get Started Now</button>
+                    <a href="#services" class="btn btn-lg btn-outline btn-secondary">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="py-20 bg-base-100">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-4">🎯 Our Premium Services</h2>
+            <p class="text-center text-base-content opacity-70 mb-12 text-lg">Everything you need to master forex trading</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Service Card 1 -->
+                <div class="card bg-gradient-to-br from-blue-50 to-blue-100 shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                    <div class="card-body">
+                        <div class="text-5xl mb-4">📺</div>
+                        <h2 class="card-title text-2xl text-primary">Live Trading Sessions</h2>
+                        <p class="text-base-content">Real-time market analysis and trading strategies with expert mentors in interactive live sessions.</p>
+                        <div class="card-actions justify-end mt-4">
+                            <span class="badge badge-primary badge-lg">Expert Led</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Card 2 (re‑colored to our palette) -->
+                <div class="card bg-gradient-to-br from-secondary/20 to-secondary/30 shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                    <div class="card-body">
+                        <div class="text-5xl mb-4">📊</div>
+                        <h2 class="card-title text-2xl text-secondary">Market Analysis</h2>
+                        <p class="text-base-content">In-depth technical and fundamental analysis to sharpen your trading decisions and market insights.</p>
+                        <div class="card-actions justify-end mt-4">
+                            <span class="badge badge-secondary badge-lg">Detailed Reports</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Card 3 (re‑colored to our palette) -->
+                <div class="card bg-gradient-to-br from-secondary/20 to-secondary/30 shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                    <div class="card-body">
+                        <div class="text-5xl mb-4">💬</div>
+                        <h2 class="card-title text-2xl text-secondary">24/7 Support</h2>
+                        <p class="text-base-content">Get instant answers and guidance from our experienced mentors whenever you need help.</p>
+                        <div class="card-actions justify-end mt-4">
+                            <span class="badge badge-secondary badge-lg">Always Available</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-base-200">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-4">✨ Key Features</h2>
+            <p class="text-center text-base-content opacity-70 mb-12 text-lg">Why traders choose Elite FX Insights</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="flex items-start gap-4 p-6 bg-base-100 rounded-lg shadow-md hover:shadow-lg transition">
+                    <div class="text-4xl text-primary flex-shrink-0">✓</div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Dynamic Meeting Access</h3>
+                        <p class="text-base-content opacity-70">Automatic meeting unlock system based on your payment status - no manual intervention needed.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4 p-6 bg-base-100 rounded-lg shadow-md hover:shadow-lg transition">
+                    <div class="text-4xl text-success flex-shrink-0">✓</div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Secure Payment Gateway</h3>
+                        <p class="text-base-content opacity-70">Bkash integration with encrypted transactions ensuring safe and reliable payment processing.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4 p-6 bg-base-100 rounded-lg shadow-md hover:shadow-lg transition">
+                    <div class="text-4xl text-warning flex-shrink-0">✓</div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Admin Control Panel</h3>
+                        <p class="text-base-content opacity-70">Complete member management and payment verification tools for seamless platform administration.</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4 p-6 bg-base-100 rounded-lg shadow-md hover:shadow-lg transition">
+                    <div class="text-4xl text-info flex-shrink-0">✓</div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Responsive Design</h3>
+                        <p class="text-base-content opacity-70">Perfect functionality across all devices - mobile, tablet, and desktop with seamless experience.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer footer-center p-10 bg-base-300 text-base-content border-t-2 border-primary">
+        <aside>
+            <p class="text-lg font-bold">&copy; 2026 Elite FX Insights. All rights reserved.</p>
+            <p>Professional Forex Trading Mentorship Platform</p>
+            <p class="text-sm opacity-70 mt-2">📧 contact@eliteflinsights.com | 🌐 www.eliteffinsights.com</p>
+        </aside>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

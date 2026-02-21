@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="skyYellow">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Elite FX Insights</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- use shared skyYellow color palette -->
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        daisyui: {
+          themes: [
+            {
+              skyYellow: {
+                "primary": "#38bdf8",
+                "secondary": "#facc15",
+                "accent": "#ffffff",
+                "neutral": "#f0f9ff",
+                "base-100": "#ffffff",
+                "base-200": "#f0f9ff",
+                "base-content": "#1e293b",
+                "info": "#0ea5e9",
+                "success": "#22c55e",
+                "warning": "#f59e0b",
+                "error": "#ef4444"
+              }
+            }
+          ]
+        }
+      };
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-base-100 scroll-smooth">
+    <!-- Navigation -->
+    <nav class="navbar bg-base-100 shadow-lg sticky top-0 z-50 border-b-2 border-primary">
+        <div class="flex-1">
+            <a href="./index.html" class="btn btn-ghost normal-case text-2xl font-bold text-primary">🚀 Elite FX</a>
+        </div>
+        <div class="flex-none gap-2">
+            <a href="./index.html" class="btn btn-ghost hover:text-primary transition">Home</a>
+            <a href="./admin.html" class="btn btn-ghost hover:text-primary transition">Admin</a>
+            <button onclick="handleLogout()" class="btn btn-error btn-sm">Logout</button>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <!-- User Profile Header -->
+        <div class="card bg-gradient-to-r from-primary/10 via-base-100 to-secondary/10 text-sky-900 shadow-2xl mb-8 border-2 border-sky-100 rounded-2xl">
+            <div class="card-body">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h1 class="text-4xl font-black mb-2">Welcome, <span id="userName">Trader</span>! 👋</h1>
+                        <p class="text-lg opacity-90">Manage your trading sessions and payment status</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm opacity-90">Status: <span id="userStatus" class="font-bold badge badge-lg badge-secondary">Active</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats (user-focused, similar to admin) -->
+        <div class="flex gap-3 mb-8 overflow-x-auto pb-2 flex-wrap">
+            <div class="badge badge-lg gap-2 px-5 py-4 bg-sky-100 text-sky-700 border border-sky-200 shadow font-bold rounded-xl flex items-center">
+                <i class="fas fa-calendar-day text-sky-400"></i>
+                <span><span id="totalMeetings">0</span> Meetings</span>
+            </div>
+            <div class="badge badge-lg gap-2 px-5 py-4 bg-green-100 text-green-700 border border-green-200 shadow font-bold rounded-xl flex items-center">
+                <i class="fas fa-play-circle text-green-400"></i>
+                <span><span id="runningMeetings">0</span> Running</span>
+            </div>
+            <div class="badge badge-lg gap-2 px-5 py-4 bg-yellow-100 text-yellow-700 border border-yellow-200 shadow font-bold rounded-xl flex items-center">
+                <i class="fas fa-bell text-yellow-400"></i>
+                <span><span id="activeNotices">0</span> Notices</span>
+            </div>
+            <div class="badge badge-lg gap-2 px-5 py-4 bg-blue-100 text-blue-700 border border-blue-200 shadow font-bold rounded-xl flex items-center">
+                <i class="fas fa-wallet text-blue-400"></i>
+                <span><span id="userPaidStatus">Paid</span></span>
+            </div>
+        </div>
+
+<!-- Responsive Tabs -->
+<div class="flex flex-col md:flex-row gap-6 mb-8">
+    <!-- Tab Buttons -->
+    <div class="flex flex-row md:flex-col md:w-56 overflow-x-auto md:overflow-x-visible -mx-4 px-4 md:mx-0 md:px-0">
+        <div class="flex flex-row md:flex-col gap-3 border-b-2 md:border-b-0 md:border-l-2 border-base-200">
+            <button onclick="showTab(event, 'meetings')" class="tab-btn text-left p-4 font-bold text-lg whitespace-nowrap rounded-lg">
+                <i class="fas fa-calendar-day mr-2"></i> Trading Sessions
+            </button>
+            <button onclick="showTab(event, 'payment')" class="tab-btn text-left p-4 font-bold text-lg whitespace-nowrap rounded-lg">
+                <i class="fas fa-wallet mr-2"></i> Payment Info
+            </button>
+            <button onclick="showTab(event, 'about')" class="tab-btn text-left p-4 font-bold text-lg whitespace-nowrap rounded-lg">
+                <i class="fas fa-info-circle mr-2"></i> About
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="flex-1 min-w-0">
+        <!-- Meetings Content -->
+        <div id="meetingsContent" class="tab-pane bg-base-100 p-6 rounded-box">
+             <div class="space-y-6">
+                <!-- Notices Section -->
+                <div id="userNoticesContainer" class="space-y-4 mb-6"></div>
+                
+                <!-- Orientation Meeting (Always Unlocked) -->
+                <div class="bg-base-200 rounded-lg shadow-md p-6 border-l-4 border-secondary">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900">Orientation মিটিং</h3>
+                            <p class="text-gray-600 mt-1">প্ল্যাটফর্ম এবং ট্রেডিং বেসিক্স সম্পর্কে পরিচয়</p>
+                        </div>
+                        <span class="px-4 py-2 bg-secondary/20 text-secondary rounded-full text-sm font-bold">আনলক</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm text-gray-600">
+                        <div><i class="fas fa-calendar"></i> <span id="meeting1Date">২০২৬-০২-২৪</span></div>
+                        <div><i class="fas fa-clock"></i> <span>০৩:০০ PM</span></div>
+                        <div><i class="fas fa-link"></i> <span>মিটিং লিংক উপলব্ধ</span></div>
+                    </div>
+                    <a href="#" onclick="joinMeeting(1)" class="inline-block px-6 py-2 btn btn-secondary font-bold">
+                        <i class="fas fa-video"></i> মিটিংয়ে যোগদান করুন
+                    </a>
+                </div>
+
+                <!-- Locked Meetings -->
+                <div id="lockedMeetings">
+                    <!-- Meeting 2 (Locked) -->
+                    <div class="bg-base-200 rounded-lg shadow-md p-6 border-l-4 border-gray-300 relative overflow-hidden meeting-locked">
+                        <div class="absolute inset-0 bg-gray-600 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-10">
+                            <div class="text-center text-white">
+                                <i class="fas fa-lock text-4xl mb-2 block"></i>
+                                <p class="font-bold text-lg">এই মিটিংয়ের জন্য পেমেন্ট প্রয়োজন</p>
+                                <p class="text-sm mt-2">পেমেন্ট সম্পন্ন করুন এবং অ্যাডমিন অনুমোদন পান</p>
+                            </div>
+                        </div>
+                        <div class="opacity-50">
+                            <h3 class="text-2xl font-bold text-gray-900">এডভান্সড মার্কেট এনালাইসিস</h3>
+                            <p class="text-gray-600 mt-1">চার্ট পড়া এবং প্যাটার্ন স্বীকৃতির উন্নত কৌশল</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm text-gray-600 mt-4">
+                                <div><i class="fas fa-calendar"></i> <span id="meeting2Date">২০২৬-০৩-০৩</span></div>
+                                <div><i class="fas fa-clock"></i> <span>০৩:০০ PM</span></div>
+                                <div><i class="fas fa-link"></i> <span>লিংক লক করা</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Meeting 3 (Locked) -->
+                    <div class="bg-base-200 rounded-lg shadow-md p-6 border-l-4 border-gray-300 relative overflow-hidden meeting-locked">
+                        <div class="absolute inset-0 bg-gray-600 bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-10">
+                            <div class="text-center text-white">
+                                <i class="fas fa-lock text-4xl mb-2 block"></i>
+                                <p class="font-bold text-lg">এই মিটিংয়ের জন্য পেমেন্ট প্রয়োজন</p>
+                                <p class="text-sm mt-2">পেমেন্ট সম্পন্ন করুন এবং অ্যাডমিন অনুমোদন পান</p>
+                            </div>
+                        </div>
+                        <div class="opacity-50">
+                            <h3 class="text-2xl font-bold text-gray-900">রিস্ক ম্যানেজমেন্ট স্ট্র্যাটেজি</h3>
+                            <p class="text-gray-600 mt-1">স্টপ লস, টেক প্রফিট এবং পজিশন সাইজিং শেখান</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-sm text-gray-600 mt-4">
+                                <div><i class="fas fa-calendar"></i> <span id="meeting3Date">২০২৬-০৩-১০</span></div>
+                                <div><i class="fas fa-clock"></i> <span>০৩:০০ PM</span></div>
+                                <div><i class="fas fa-link"></i> <span>লিংক লক করা</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Content -->
+        <div id="paymentContent" class="tab-pane hidden bg-base-100 p-6 rounded-box">
+             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Payment Requests (if any) -->
+                <div class="md:col-span-3" id="paymentRequestsContainer"></div>
+                <!-- Payment Form -->
+                <div class="md:col-span-2">
+                    <div class="bg-base-200 rounded-lg shadow-md p-8">
+                        <h2 class="text-2xl font-bold mb-6">পেমেন্ট তথ্য সাবমিট করুন</h2>
+                        <form id="paymentForm" onsubmit="handlePaymentSubmit(event)">
+                            <div class="mb-6">
+                                <label class="block text-gray-700 font-bold mb-2">বিকাশ নম্বর</label>
+                                <input type="text" id="bkashNumber" placeholder="যেমন: XXXXXXXXX" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600" required>
+                                <p class="text-gray-500 text-sm mt-1">আপনার সক্রিয় বিকাশ নম্বর প্রবেশ করান</p>
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-gray-700 font-bold mb-2">পেমেন্ট পরিমাণ (টাকা)</label>
+                                <input type="number" id="paymentAmount" placeholder="যেমন: 500" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600" required>
+                                <p class="text-gray-500 text-sm mt-1">মিটিং এক্সেসের জন্য ন্যূনতম পরিমাণ: ৫০০ টাকা</p>
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-gray-700 font-bold mb-2">ট্রানজেকশন আইডি (TrxID)</label>
+                                <input type="text" id="trxId" placeholder="যেমন: ABC123XYZ789" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600" required>
+                                <p class="text-gray-500 text-sm mt-1">বিকাশ থেকে পাওয়া ট্রানজেকশন আইডি প্রবেশ করান</p>
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-gray-700 font-bold mb-2">বিস্তারিত মন্তব্য (ঐচ্ছিক)</label>
+                                <textarea id="paymentNotes" placeholder="যেকোনো অতিরিক্ত তথ্য লিখুন..." rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-600"></textarea>
+                            </div>
+                            <button type="submit" class="w-full px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition">
+                                <i class="fas fa-paper-plane"></i> পেমেন্ট সাবমিট করুন
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <!-- Payment Status -->
+                <div>
+                    <div class="bg-base-200 rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-bold mb-4">পেমেন্ট স্ট্যাটাস</h3>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-primary/10 border border-blue-200 rounded-lg">
+                                <p class="text-sm text-gray-600">বর্তমান স্ট্যাটাস</p>
+                                <p class="text-2xl font-bold text-blue-600" id="paymentStatus">সক্রিয়</p>
+                            </div>
+                            <div class="p-4 bg-base-200 border border-gray-200 rounded-lg">
+                                <p class="text-sm text-gray-600">মোট পেমেন্ট করা</p>
+                                <p class="text-2xl font-bold text-gray-900" id="totalPaid"> টাকা</p>
+                            </div>
+                            <div class="p-4 bg-base-200 border border-gray-200 rounded-lg">
+                                <p class="text-sm text-gray-600">পরবর্তী ডিউ তারিখ</p>
+                                <p class="text-lg font-bold text-gray-900" id="nextDueDate">N/A</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-yellow-50 rounded-lg shadow-md p-6 mt-6 border border-yellow-200">
+                        <h3 class="font-bold text-yellow-800 mb-3">গুরুত্বপূর্ণ নির্দেশনা</h3>
+                        <ul class="text-sm text-yellow-700 space-y-2">
+                            <li><i class="fas fa-check text-green-600"></i> বিকাশে সঠিক টাকা পাঠান</li>
+                            <li><i class="fas fa-check text-green-600"></i> TrxID সঠিকভাবে প্রবেশ করান</li>
+                            <li><i class="fas fa-check text-green-600"></i> অ্যাডমিন যাচাইকরণের অপেক্ষা করুন</li>
+                            <li><i class="fas fa-check text-green-600"></i> অনুমোদনের পর মিটিং আনলক হবে</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Content -->
+        <div id="aboutContent" class="tab-pane hidden bg-base-100 p-6 rounded-box">
+             <h2 class="text-3xl font-bold mb-6 text-sky-800">About Elite FX Insights</h2>
+            <div class="space-y-4 text-lg text-slate-700">
+                <p>Elite FX Insights is a premier platform dedicated to empowering forex traders with the knowledge and tools they need to succeed. Our mission is to provide high-quality education and resources that demystify the complexities of the forex market.</p>
+                <p>Our comprehensive curriculum covers everything from the basics of forex trading to advanced market analysis and risk management strategies. We believe in a structured learning path, which is why our advanced sessions are unlocked after ensuring you have a solid foundation.</p>
+                <p>The platform is designed to be user-friendly and intuitive, allowing you to manage your learning journey, track your progress, and handle payments seamlessly. We are committed to transparency and providing a supportive learning environment.</p>
+                <p>Join us and take the next step in your forex trading career. With Elite FX Insights, you are not just learning to trade; you are learning to thrive.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg p-8 max-w-md">
+            <div class="text-center">
+                <div class="text-6xl text-green-500 mb-4">✓</div>
+                <h2 class="text-2xl font-bold mb-2">সাবমিট সফল!</h2>
+                <p class="text-gray-600 mb-6">আপনার পেমেন্ট তথ্য সফলভাবে সাবমিট করা হয়েছে। অ্যাডমিন শীঘ্রই যাচাই করবেন।</p>
+                <button onclick="closeModal()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">বন্ধ করুন</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

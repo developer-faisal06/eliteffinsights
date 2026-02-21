@@ -1,0 +1,8 @@
+{
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#342E0C",
+        "titleBar.activeBackground": "#484011",
+        "titleBar.activeForeground": "#FCFAF0"
+    },
+    "geminiAssistant.apiKey": "AIzaSyDMJ1f2wNoodf2GlfTzQkdy1X7MPD1t-yc"
+}
